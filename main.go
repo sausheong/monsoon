@@ -20,7 +20,6 @@ var (
 	wd          string
 	bin         string
 	model       string
-	promptFile  string
 	gpuLayers   string
 	threads     string
 	contextSize string
@@ -38,17 +37,16 @@ func init() {
 	}
 	bin = os.Getenv("LOCAL_LLM_BIN")
 	model = os.Getenv(("LOCAL_LLM_MODEL"))
-	promptFile = os.Getenv(("LOCAL_LLM_PROMPT_FILE"))
 	gpuLayers = os.Getenv(("LOCAL_LLM_NUM_GPU_LAYERS"))
 	threads = os.Getenv(("LOCAL_LLM_NUM_CPU_CORES"))
 	contextSize = os.Getenv(("LOCAL_LLM_CONTEXT"))
-
 }
 
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
+	r.Handle("/static/*", http.StripPrefix("/static",
+		http.FileServer(http.Dir("./static"))))
 	r.Get("/", index)
 	r.Post("/run", run)
 	log.Println("\033[93mMonsoon started. Press CTRL+C to quit.\033[0m")
@@ -74,9 +72,9 @@ func run(w http.ResponseWriter, r *http.Request) {
 	}
 	// create the LLM
 	bin := fmt.Sprintf("%s/%s", wd, bin)
-	args := fmt.Sprintf("-m %s/%s -t %s --temp 0 -c %s"+
-		" -ngl %s --file %s/%s -r \"[Question]\" -p",
-		wd, model, threads, contextSize, gpuLayers, wd, promptFile)
+	args := fmt.Sprintf("-m %s/%s -t %s --temp 0 -eps 1e-5 -c %s -ngl %s -p",
+		wd, model, threads, contextSize, gpuLayers)
+
 	llm, err := local.New(
 		local.WithBin(bin),
 		local.WithArgs(args),
