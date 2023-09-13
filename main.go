@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
+	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/local"
 )
 
@@ -85,7 +86,12 @@ func run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	completion, err := llm.Call(context.Background(), prompt.Input)
+	completion, err := llm.Call(context.Background(), prompt.Input,
+		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+			fmt.Print(string(chunk))
+			return nil
+		}))
+
 	if err != nil {
 		log.Println("Cannot get completion:", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
