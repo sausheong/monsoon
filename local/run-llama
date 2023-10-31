@@ -1,2 +1,0 @@
-./llamacpp -m llama-2-7b-chat.ggmlv3.q4_K_S.bin -t 12 --temp 0 -eps 1e-5 -c 4096 -ngl 38 -p "What is the capital of France?"
-./main -m /Users/admin/go/src/github.com/sausheong/monsoon/local/llama-2-13b-chat.ggmlv3.q5_K_M.bin -ngl 38 --temp 0 -p "What is the capital of France?"
